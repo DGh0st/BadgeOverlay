@@ -1,5 +1,4 @@
 @interface SBIconBadgeView : UIView
-+(id)_checkoutImageForText:(id)arg1 highlighted:(BOOL)arg2;
 -(void)resetupBadgeView;
 @end
 
@@ -70,7 +69,7 @@ static void respringDevice() {
 -(id)init {
 	self = %orig();
 	if (self != nil && isEnabled) {
-		[self resetupBadgeView];
+		[self layoutSubviews];
 	}
 	return self;
 }
@@ -119,9 +118,11 @@ static void respringDevice() {
 		SBDarkeningImageView *_textView = MSHookIvar<SBDarkeningImageView *>(self, "_textView");
 		if (_backgroundView != nil && _textView != nil) {
 			CGRect frame = _textView.frame;
-			frame.size.width *= _backgroundView.frame.size.height / frame.size.height;
-			frame.size.height = _backgroundView.frame.size.height;
-			_textView.frame = frame;
+			if (frame.size.height != 0) {
+				frame.size.width *= _backgroundView.frame.size.height / frame.size.height;
+				frame.size.height = _backgroundView.frame.size.height;
+				_textView.frame = frame;
+			}
 
 			_textView.center = _backgroundView.center;
 		}
