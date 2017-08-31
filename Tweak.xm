@@ -1,4 +1,5 @@
 @interface SBIconBadgeView : UIView
++(id)_checkoutImageForText:(id)arg1 highlighted:(BOOL)arg2;
 -(void)resetupBadgeView;
 @end
 
@@ -89,25 +90,42 @@ static void respringDevice() {
 
 %new
 -(void)resetupBadgeView {
-	self.frame = CGRectMake(0, 0, 60, 60);
+	id parentView = [self superview];
 
-	SBDarkeningImageView *_backgroundView = MSHookIvar<SBDarkeningImageView *>(self, "_backgroundView");
-	if (_backgroundView != nil) {
-		_backgroundView.frame = CGRectMake(0, 0, 60, 60);
-		_backgroundView.backgroundColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.66];
-		_backgroundView.layer.cornerRadius = badgeOverlayRoundness;
+	if (parentView == nil) {
+		return;
+	} else if ([parentView isKindOfClass:%c(SBIconView)]) {
+		self.frame = CGRectMake(0, 0, 60, 60);
 
-		if (isBlackBackgroundEnabled)
-			[_backgroundView setImage:nil];
+		SBDarkeningImageView *_backgroundView = MSHookIvar<SBDarkeningImageView *>(self, "_backgroundView");
+		if (_backgroundView != nil) {
+			_backgroundView.frame = CGRectMake(0, 0, 60, 60);
+			_backgroundView.backgroundColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.66];
+			_backgroundView.layer.cornerRadius = badgeOverlayRoundness;
 
-		for (UIView *view in [_backgroundView subviews])
-			if ([view isKindOfClass:%c(SBIconBlurryBackgroundView)])
-				view.hidden = YES;
+			if (isBlackBackgroundEnabled)
+				[_backgroundView setImage:nil];
+
+			for (UIView *view in [_backgroundView subviews])
+				if ([view isKindOfClass:%c(SBIconBlurryBackgroundView)])
+					view.hidden = YES;
+		}
+
+		SBDarkeningImageView *_textView = MSHookIvar<SBDarkeningImageView *>(self, "_textView");
+		if (_textView != nil)
+			_textView.center = CGPointMake(30, 30);
+	} else { // undo our modifications to fix it for force touch menu badges
+		SBDarkeningImageView *_backgroundView = MSHookIvar<SBDarkeningImageView *>(self, "_backgroundView");
+		SBDarkeningImageView *_textView = MSHookIvar<SBDarkeningImageView *>(self, "_textView");
+		if (_backgroundView != nil && _textView != nil) {
+			CGRect frame = _textView.frame;
+			frame.size.width *= _backgroundView.frame.size.height / frame.size.height;
+			frame.size.height = _backgroundView.frame.size.height;
+			_textView.frame = frame;
+
+			_textView.center = _backgroundView.center;
+		}
 	}
-
-	SBDarkeningImageView *_textView = MSHookIvar<SBDarkeningImageView *>(self, "_textView");
-	if (_textView != nil)
-		_textView.center = CGPointMake(30, 30);
 }
 %end
 
