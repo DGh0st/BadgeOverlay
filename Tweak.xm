@@ -3,6 +3,7 @@
 @end
 
 @interface SBDarkeningImageView : UIImageView
+-(void)setImage:(id)arg1;
 @end
 
 @interface FBSystemService
@@ -17,6 +18,7 @@
 
 static BOOL isEnabled = YES;
 static CGFloat badgeOverlayRoundness = 12.5;
+static BOOL isBlackBackgroundEnabled = YES;
 
 static void reloadPrefs() {
 	CFPreferencesAppSynchronize((CFStringRef)kIdentifier);
@@ -36,6 +38,7 @@ static void reloadPrefs() {
 
 	isEnabled = [prefs objectForKey:@"isEnabled"] ? [[prefs objectForKey:@"isEnabled"] boolValue] : YES;
 	badgeOverlayRoundness = [prefs objectForKey:@"badgeOverlayRoundness"] ? [[prefs objectForKey:@"badgeOverlayRoundness"] floatValue] : 12.5;
+	isBlackBackgroundEnabled = [prefs objectForKey:@"isBlackBackgroundEnabled"] ? [[prefs objectForKey:@"isBlackBackgroundEnabled"] boolValue] : YES;
 }
 
 static void respringDevice() {
@@ -93,6 +96,9 @@ static void respringDevice() {
 		_backgroundView.frame = CGRectMake(0, 0, 60, 60);
 		_backgroundView.backgroundColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.66];
 		_backgroundView.layer.cornerRadius = badgeOverlayRoundness;
+
+		if (isBlackBackgroundEnabled)
+			[_backgroundView setImage:nil];
 
 		for (UIView *view in [_backgroundView subviews])
 			if ([view isKindOfClass:%c(SBIconBlurryBackgroundView)])
