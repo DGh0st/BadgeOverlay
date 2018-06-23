@@ -19,6 +19,7 @@
 static BOOL isEnabled = YES;
 static CGFloat badgeOverlayRoundness = 12.5;
 static BOOL isBlackBackgroundEnabled = YES;
+static CGFloat badgeOverlayOpacity = 0.66;
 
 static void reloadPrefs() {
 	CFPreferencesAppSynchronize((CFStringRef)kIdentifier);
@@ -39,6 +40,7 @@ static void reloadPrefs() {
 	isEnabled = [prefs objectForKey:@"isEnabled"] ? [[prefs objectForKey:@"isEnabled"] boolValue] : YES;
 	badgeOverlayRoundness = [prefs objectForKey:@"badgeOverlayRoundness"] ? [[prefs objectForKey:@"badgeOverlayRoundness"] floatValue] : 12.5;
 	isBlackBackgroundEnabled = [prefs objectForKey:@"isBlackBackgroundEnabled"] ? [[prefs objectForKey:@"isBlackBackgroundEnabled"] boolValue] : YES;
+	badgeOverlayOpacity = [prefs objectForKey:@"badgeOverlayOpacity"] ? [[prefs objectForKey:@"badgeOverlayOpacity"] floatValue] : 0.66;
 }
 
 static void respringDevice() {
@@ -66,14 +68,6 @@ static void respringDevice() {
 	return %orig();
 }
 
--(id)init {
-	self = %orig();
-	if (self != nil && isEnabled) {
-		[self layoutSubviews];
-	}
-	return self;
-}
-
 -(void)layoutSubviews {
 	%orig();
 
@@ -89,17 +83,18 @@ static void respringDevice() {
 
 %new
 -(void)resetupBadgeView {
-	id parentView = [self superview];
+	UIView *parentView = [self superview];
 
 	if (parentView == nil) {
 		return;
 	} else if ([parentView isKindOfClass:%c(SBIconView)]) {
-		self.frame = CGRectMake(0, 0, 60, 60);
+		CGFloat length = MIN(parentView.bounds.size.width, parentView.bounds.size.height);
+		self.frame = CGRectMake(0, 0, length, length);
 
 		SBDarkeningImageView *_backgroundView = MSHookIvar<SBDarkeningImageView *>(self, "_backgroundView");
 		if (_backgroundView != nil) {
-			_backgroundView.frame = CGRectMake(0, 0, 60, 60);
-			_backgroundView.backgroundColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.66];
+			_backgroundView.frame = CGRectMake(0, 0, length, length);
+			_backgroundView.backgroundColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:badgeOverlayOpacity];
 			_backgroundView.layer.cornerRadius = badgeOverlayRoundness;
 
 			if (isBlackBackgroundEnabled)
@@ -112,7 +107,7 @@ static void respringDevice() {
 
 		SBDarkeningImageView *_textView = MSHookIvar<SBDarkeningImageView *>(self, "_textView");
 		if (_textView != nil)
-			_textView.center = CGPointMake(30, 30);
+			_textView.center = CGPointMake(length / 2, length / 2);
 	} else { // undo our modifications to fix it for force touch menu badges
 		SBDarkeningImageView *_backgroundView = MSHookIvar<SBDarkeningImageView *>(self, "_backgroundView");
 		SBDarkeningImageView *_textView = MSHookIvar<SBDarkeningImageView *>(self, "_textView");
