@@ -1,3 +1,6 @@
+@interface SBIconView : UIView
+@end
+
 @interface SBIconBadgeView : UIView
 -(void)resetupBadgeView;
 @end
@@ -30,17 +33,19 @@ static void reloadPrefs() {
 		if (keyList != nil) {
 			prefs = (NSDictionary *)CFPreferencesCopyMultiple(keyList, (CFStringRef)kIdentifier, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 			if (prefs == nil)
-				prefs = [NSDictionary dictionary];
+				prefs = [NSDictionary new];
 			CFRelease(keyList);
 		}
 	} else {
-		prefs = [NSDictionary dictionaryWithContentsOfFile:kSettingsPath];
+		prefs = [[NSDictionary alloc] initWithContentsOfFile:kSettingsPath];
 	}
 
 	isEnabled = [prefs objectForKey:@"isEnabled"] ? [[prefs objectForKey:@"isEnabled"] boolValue] : YES;
 	badgeOverlayRoundness = [prefs objectForKey:@"badgeOverlayRoundness"] ? [[prefs objectForKey:@"badgeOverlayRoundness"] floatValue] : 12.5;
 	isBlackBackgroundEnabled = [prefs objectForKey:@"isBlackBackgroundEnabled"] ? [[prefs objectForKey:@"isBlackBackgroundEnabled"] boolValue] : YES;
 	badgeOverlayOpacity = [prefs objectForKey:@"badgeOverlayOpacity"] ? [[prefs objectForKey:@"badgeOverlayOpacity"] floatValue] : 0.66;
+
+	[prefs release];
 }
 
 static void respringDevice() {
@@ -52,6 +57,22 @@ static void respringDevice() {
 	if (isEnabled)
 		return (CGRect){CGPointMake(0, 0), %orig().size};
 	return %orig();
+}
+
+-(void)_updateLabelAccessoryView {
+	%orig();
+
+	UIView *_accessoryView = MSHookIvar<UIView *>(self, "_accessoryView");
+	if (isEnabled && _accessoryView != nil && [_accessoryView isKindOfClass:%c(SBIconBadgeView)])
+		[(SBIconBadgeView *)_accessoryView resetupBadgeView];
+}
+
+-(void)_updateAccessoryViewWithAnimation:(BOOL)arg1 {
+	%orig(arg1);
+
+	UIView *_accessoryView = MSHookIvar<UIView *>(self, "_accessoryView");
+	if (isEnabled && _accessoryView != nil && [_accessoryView isKindOfClass:%c(SBIconBadgeView)])
+		[(SBIconBadgeView *)_accessoryView resetupBadgeView];
 }
 %end
 

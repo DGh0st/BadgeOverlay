@@ -1,7 +1,7 @@
 Package: com.dgh0st.badgeoverlay
 Name: BadgeOverlay
 Depends: mobilesubstrate
-Version: 0.0.4
+Version: 0.0.5
 Architecture: iphoneos-arm
 Description: Make badges overlay on top of icons instead of being in the corner.
 Maintainer: DGh0st <deeppwnage@yahoo.com>
