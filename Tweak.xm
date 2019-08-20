@@ -84,7 +84,7 @@ static void respringDevice() {
 }
 
 +(CGPoint)_textOffset {
-	if (isEnabled)
+	if (isEnabled && ![self respondsToSelector:@selector(badgeSize)])
 		return CGPointMake(14, 18);
 	return %orig();
 }
@@ -99,6 +99,12 @@ static void respringDevice() {
 -(CGPoint)accessoryOriginForIconBounds:(CGRect)arg1 {
 	if (isEnabled)
 		return CGPointMake(0, 0);
+	return %orig(arg1);
+}
+
+-(CGPoint)accessoryCenterForIconBounds:(CGRect)arg1 {
+	if (isEnabled)
+		return CGPointMake(arg1.size.width / 2, arg1.size.height / 2);
 	return %orig(arg1);
 }
 

@@ -1,4 +1,4 @@
-export TARGET = iphone:clang:8.1:latest
+export TARGET = iphone:clang:8.1:7.0
 
 include $(THEOS)/makefiles/common.mk
 

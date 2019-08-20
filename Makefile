@@ -1,5 +1,5 @@
 export ARCHS = armv7 arm64
-export TARGET = iphone:clang:9.3:latest
+export TARGET = iphone:clang:8.1:7.0
 
 PACKAGE_VERSION = $(THEOS_PACKAGE_BASE_VERSION)
 
