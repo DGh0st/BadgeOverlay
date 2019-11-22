@@ -1,8 +1,6 @@
 export ARCHS = armv7 arm64
 export TARGET = iphone:clang:8.1:7.0
 
-PACKAGE_VERSION = $(THEOS_PACKAGE_BASE_VERSION)
-
 include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = BadgeOverlay

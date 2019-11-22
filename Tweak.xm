@@ -52,6 +52,16 @@ static void respringDevice() {
 	[[%c(FBSystemService) sharedInstance] exitAndRelaunch:YES];
 }
 
+// returns the first ancestor view that is of the specified view type
+static UIView *viewAncestorOfViewType(UIView *descendantView, Class viewType) {
+	while (descendantView != nil) {
+		if ([descendantView isKindOfClass:viewType])
+			return descendantView;
+		descendantView = descendantView.superview;
+	}
+	return nil;
+}
+
 %hook SBIconView
 -(CGRect)_frameForAccessoryView {
 	if (isEnabled)
@@ -83,8 +93,14 @@ static void respringDevice() {
 	return %orig();
 }
 
+-(id)font {
+	if (isEnabled)
+		return [UIFont systemFontOfSize:32];
+	return %orig();
+}
+
 +(CGPoint)_textOffset {
-	if (isEnabled && ![self respondsToSelector:@selector(badgeSize)])
+	if (isEnabled && ![self respondsToSelector:@selector(badgeSize)] && ![self instancesRespondToSelector:@selector(badgeSize)])
 		return CGPointMake(14, 18);
 	return %orig();
 }
@@ -114,7 +130,7 @@ static void respringDevice() {
 
 	if (parentView == nil) {
 		return;
-	} else if ([parentView isKindOfClass:%c(SBIconView)]) {
+	} else if (viewAncestorOfViewType(self, %c(SBIconView)) != nil) {
 		CGFloat length = MIN(parentView.bounds.size.width, parentView.bounds.size.height);
 		self.frame = CGRectMake(0, 0, length, length);
 
