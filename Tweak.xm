@@ -53,10 +53,12 @@ static void respringDevice() {
 }
 
 // returns the first ancestor view that is of the specified view type
-static UIView *viewAncestorOfViewType(UIView *descendantView, Class viewType) {
+static UIView *viewAncestorOfViewType(UIView *descendantView, NSArray *viewTypes) {
 	while (descendantView != nil) {
-		if ([descendantView isKindOfClass:viewType])
-			return descendantView;
+		for (Class viewType in viewTypes) {
+			if ([descendantView isKindOfClass:viewType])
+				return descendantView;
+		}
 		descendantView = descendantView.superview;
 	}
 	return nil;
@@ -130,7 +132,7 @@ static UIView *viewAncestorOfViewType(UIView *descendantView, Class viewType) {
 
 	if (parentView == nil) {
 		return;
-	} else if (viewAncestorOfViewType(self, %c(SBIconView)) != nil) {
+	} else if (viewAncestorOfViewType(self, @[%c(SBIconView), %c(RFView)]) != nil) { // Added support to Rofi's view
 		CGFloat length = MIN(parentView.bounds.size.width, parentView.bounds.size.height);
 		self.frame = CGRectMake(0, 0, length, length);
 
