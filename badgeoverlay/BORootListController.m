@@ -1,4 +1,5 @@
 #include "BORootListController.h"
+#include <spawn.h>
 
 @implementation BORootListController
 
@@ -28,10 +29,11 @@
 		[emailController setSubject:@"BadgeOverlay Support"];
 		[emailController setToRecipients:[NSArray arrayWithObjects:@"deeppwnage@yahoo.com", nil]];
 		[emailController addAttachmentData:[NSData dataWithContentsOfFile:@"/var/mobile/Library/Preferences/com.dgh0st.badgeoverlay.plist"] mimeType:@"application/xml" fileName:@"Prefs.plist"];
-		#pragma GCC diagnostic push
-		#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-		system("/usr/bin/dpkg -l > /tmp/dpkgl.log");
-		#pragma GCC diagnostic pop
+		pid_t pid;
+		const char *argv[] = { "/usr/bin/dpkg", "-l" ">" "/tmp/dpkgl.log" };
+		extern char *const *environ;
+		posix_spawn(&pid, argv[0], NULL, NULL, (char *const *)argv, environ);
+		waitpid(pid, NULL, 0);
 		[emailController addAttachmentData:[NSData dataWithContentsOfFile:@"/tmp/dpkgl.log"] mimeType:@"text/plain" fileName:@"dpkgl.txt"];
 		[self.navigationController presentViewController:emailController animated:YES completion:nil];
 		[emailController setMailComposeDelegate:self];
@@ -43,6 +45,9 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
 - (void)donate {
 	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://paypal.me/DGhost"]];
 }
@@ -50,6 +55,8 @@
 - (void)follow {
 	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://mobile.twitter.com/D_Gh0st"]];
 }
+
+#pragma clang diagnostic pop
 
 - (void)respring {
 	UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"BadgeOverlay" message:@"Are you sure you want to respring?" preferredStyle:UIAlertControllerStyleAlert];

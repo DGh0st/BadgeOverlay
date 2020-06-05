@@ -130,9 +130,15 @@ static UIView *viewAncestorOfViewType(UIView *descendantView, NSArray *viewTypes
 -(void)resetupBadgeView {
 	UIView *parentView = [self superview];
 
+	 NSMutableArray *viewTypes = [NSMutableArray arrayWithObject:%c(SBIconView)];
+	 // Added support to Rofi's view
+	 if (%c(RFView)) {
+	 	[viewTypes addObject:%c(RFView)];
+	 }
+
 	if (parentView == nil) {
 		return;
-	} else if (viewAncestorOfViewType(self, @[%c(SBIconView), %c(RFView)]) != nil) { // Added support to Rofi's view
+	} else if (viewAncestorOfViewType(self, viewTypes) != nil) {
 		CGFloat length = MIN(parentView.bounds.size.width, parentView.bounds.size.height);
 		self.frame = CGRectMake(0, 0, length, length);
 

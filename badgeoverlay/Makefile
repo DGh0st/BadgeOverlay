@@ -1,5 +1,3 @@
-export TARGET = iphone:clang:8.1:7.0
-
 include $(THEOS)/makefiles/common.mk
 
 BUNDLE_NAME = BadgeOverlay
